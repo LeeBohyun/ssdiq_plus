@@ -62,7 +62,7 @@ ZONES="s0.9 f0.1 s0.1 f0.9"
 ```
 ---
 
-### ZNS-like pattern (Non-Overwriting Write Access)
+### ZNS-like pattern
 
 Strictly ZNS-like workload:
 
