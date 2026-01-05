@@ -1,21 +1,20 @@
 #pragma once
 // -------------------------------------------------------------------------------------
+#include "Time.hpp"
 #include "Units.hpp"
+#include "Exceptions.hpp"
 // -------------------------------------------------------------------------------------
+#include <chrono>
 #include <cstdint>
+#include <memory>
 // -------------------------------------------------------------------------------------
-namespace mean {
+namespace mean
+{
 // -------------------------------------------------------------------------------------
-enum class IoRequestType : std::uint8_t { Undefined = 0,
-                                          Write,
-                                          Read,
-                                          Fsync,
-                                          ZnsAppend,
-                                          Free,
-                                          Trim };
+enum class IoRequestType { Undefined = 0, Write, Read, Fsync, ZnsAppend, Free, Trim };
 // -------------------------------------------------------------------------------------
 class IoBaseRequest;
-using UserIoCallbackFunPtr = void (*)(IoBaseRequest*);
+using UserIoCallbackFunPtr = void (*)(IoBaseRequest* );
 struct PtrInt {
    union {
       void* ptr;
@@ -32,12 +31,13 @@ struct UserIoCallback {
    PtrInt user_data;
    PtrInt user_data2;
    PtrInt user_data3;
-   UserIoCallback() = default;
-   UserIoCallback(UserIoCallbackFunPtr callback) : callback(callback) {}
+   UserIoCallback() { }
+   UserIoCallback(UserIoCallbackFunPtr cb) { callback = cb; }
 };
 // -------------------------------------------------------------------------------------
-class IoBaseRequest {
- public:
+class IoBaseRequest
+{
+  public:
    u64 id = 1000001;
    // -------------------------------------------------------------------------------------
    IoRequestType type = IoRequestType::Undefined;
@@ -49,7 +49,7 @@ class IoBaseRequest {
    UserIoCallback user;
    // -------------------------------------------------------------------------------------
    int device = 0;
-   s64 offset = 0;
+   u64 offset = 0;
    // -------------------------------------------------------------------------------------
    UserIoCallback innerCallback;
    u64 innerData = -1;
@@ -70,34 +70,12 @@ class IoBaseRequest {
       uint64_t completion_time;
    } stats;
    // -------------------------------------------------------------------------------------
-   IoBaseRequest() = default;
+   IoBaseRequest() { id = 0xAA00AA00AA00AA00; }
    IoBaseRequest(IoRequestType type, char* data, u64 addr, u64 len, UserIoCallback user, bool write_back = false);
    //
-   void setupWrite(char* data, s64 addr, u64 len, UserIoCallback cb, bool write_back = false) {
-      this->type = IoRequestType::Write;
-      this->data = data;
-      this->addr = addr;
-      this->len = len;
-      this->user = cb;
-      this->write_back = write_back;
-      this->reuse_request = false;
-   }
-   void setupRead(char* data, s64 addr, u64 len, UserIoCallback cb) {
-      this->type = IoRequestType::Read;
-      this->data = data;
-      this->addr = addr;
-      this->len = len;
-      this->user = cb;
-      this->reuse_request = false;
-   }
-   void setupFsync(UserIoCallback cb) {
-      this->type = IoRequestType::Fsync;
-      this->data = nullptr;
-      this->addr = 0;
-      this->len = 0;
-      this->user = cb;
-      this->reuse_request = false;
-   }
+   void setupWrite(char* data, s64 addr, u64 len, UserIoCallback cb, bool write_back = false) { this->type = IoRequestType::Write; this->data = data; this->addr = addr; this->len = len; this->user = cb; this->write_back = write_back; this->reuse_request = false; }
+   void setupRead(char* data, s64 addr, u64 len, UserIoCallback cb)                           { this->type = IoRequestType::Read;  this->data = data; this->addr = addr; this->len = len; this->user = cb;                                this->reuse_request = false; }
+   void setupFsync(UserIoCallback cb)                                                         { this->type = IoRequestType::Fsync;  this->data = 0; this->addr = 0; this->len = 0; this->user = cb;                                this->reuse_request = false; }
    // -------------------------------------------------------------------------------------
    char* buffer();
    // -------------------------------------------------------------------------------------
@@ -110,5 +88,5 @@ struct RaidRequest {
    IoBaseRequest base;
 };
 // -------------------------------------------------------------------------------------
-} // namespace mean
+}  // namespace mean
 // -------------------------------------------------------------------------------------

@@ -14,15 +14,16 @@
 #include <unordered_map>
 #include <vector>
 // -------------------------------------------------------------------------------------
-namespace mean {
+namespace mean
+{
 // -------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------
 class SpdkChannel;
-class SpdkEnv {
+class SpdkEnv 
+{
    std::unique_ptr<NVMeMultiController> controller;
    std::vector<std::unique_ptr<SpdkChannel>> channels;
-
- public:
+  public:
    ~SpdkEnv();
    void init(IoOptions options);
    SpdkChannel& getIoChannel(int channel);
@@ -35,7 +36,8 @@ class SpdkEnv {
    DeviceInformation getDeviceInfo();
 };
 // -------------------------------------------------------------------------------------
-class SpdkChannel {
+class SpdkChannel 
+{
    std::vector<RaidRequest<SpdkIoReq>*> write_request_stack;
 
    IoOptions options;
@@ -48,13 +50,14 @@ class SpdkChannel {
    // -------------------------------------------------------------------------------------
    void prepare_request(RaidRequest<SpdkIoReq>* req, SpdkIoReqCallback spdkCb);
    // -------------------------------------------------------------------------------------
- public:
-   SpdkChannel(IoOptions options, NVMeMultiController& controller, int queue);
+  public:
+   SpdkChannel(IoOptions options, NVMeMultiController& controller, int queue) ;
    ~SpdkChannel();
    // -------------------------------------------------------------------------------------
    void _push(RaidRequest<SpdkIoReq>* req);
    void pushBlocking(IoRequestType type, char* data, s64 addr, u64 len, bool write_back) { throw std::logic_error("not implemented"); }
-   int _submit() {
+   int _submit()
+   {
       for (auto& req: write_request_stack) {
          int ret;
          if (true || outstanding[req->base.device] < 5) {
@@ -63,7 +66,7 @@ class SpdkChannel {
             ensure(ret == 0);
             req = nullptr;
          }
-         // controller.submit(req->base.device, queue, reinterpret_cast<SpdkIoReq*>(&req->impl));
+         //controller.submit(req->base.device, queue, reinterpret_cast<SpdkIoReq*>(&req->impl));
       }
       int left = 0;
       for (int i = 0; i < write_request_stack.size(); i++) {
@@ -73,11 +76,12 @@ class SpdkChannel {
       }
       int submitted = write_request_stack.size() - left;
       write_request_stack.resize(left);
-      // write_request_stack.clear();
+      //write_request_stack.clear();
       return submitted;
    }
 
-   int _poll(int) {
+   int _poll(int)
+   {
       int done = 0;
       /*
       bool keepPolling = false;
@@ -111,6 +115,6 @@ class SpdkChannel {
    }
 };
 // -------------------------------------------------------------------------------------
-} // namespace mean
+}  // namespace mean
 // -------------------------------------------------------------------------------------
 #endif

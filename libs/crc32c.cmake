@@ -1,20 +1,11 @@
 # libs/crc32c.cmake
-
 include(FetchContent)
 
-cmake_policy(PUSH)  # Save current policy settings
-cmake_policy(SET CMP0091 NEW)  # Set the new policy
-
+# Use a modern crc32c version with up-to-date CMake
 FetchContent_Declare(
     crc32c
     GIT_REPOSITORY https://github.com/google/crc32c.git
-    GIT_TAG 1.1.2
+    GIT_TAG 1.1.2   # or newer (v1.1.2.1+ fixes CMake policy warnings)
 )
 
-set(CRC32C_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(CRC32C_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
-
 FetchContent_MakeAvailable(crc32c)
-
-cmake_policy(POP)  # Restore previous policy settings
-

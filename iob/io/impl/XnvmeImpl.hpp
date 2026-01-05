@@ -2,8 +2,8 @@
 #if LEANSTORE_INCLUDE_XNVME
 // -------------------------------------------------------------------------------------
 #include "../IoAbstraction.hpp"
-#include "../Raid.hpp"
 #include "../RequestStack.hpp"
+#include "../Raid.hpp"
 // -------------------------------------------------------------------------------------
 #include "libxnvme.h"
 #include "libxnvme_pp.h"
@@ -13,7 +13,8 @@
 #include <memory>
 #include <unordered_map>
 // -------------------------------------------------------------------------------------
-namespace mean {
+namespace mean
+{
 // -------------------------------------------------------------------------------------
 /*
 struct SpdkRequest : SpdkIoReq {
@@ -32,12 +33,13 @@ struct XnvmeDevQueues {
    int nsid;
    std::vector<xnvme_queue*> queues;
 };
-class XnvmeEnv {
+class XnvmeEnv 
+{
    std::unique_ptr<RaidController<XnvmeDevQueues>> raidCtl;
    IoOptions ioOptions;
    std::vector<std::unique_ptr<XnvmeChannel>> channels;
 
- public:
+  public:
    ~XnvmeEnv();
    void init(IoOptions options);
    XnvmeChannel& getIoChannel(int channel);
@@ -50,7 +52,8 @@ class XnvmeEnv {
    DeviceInformation getDeviceInfo();
 };
 // -------------------------------------------------------------------------------------
-class XnvmeChannel {
+class XnvmeChannel
+{
    std::vector<RaidRequest<XnvmeRequest>*> write_request_stack;
 
    IoOptions ioOptions;
@@ -61,20 +64,20 @@ class XnvmeChannel {
    void prepare_request(RaidRequest<XnvmeRequest>* req);
    void completion(IoBaseRequest* req);
    // -------------------------------------------------------------------------------------
- public:
+  public:
    XnvmeChannel(IoOptions options, RaidController<XnvmeDevQueues>& raidCtl, int queue, XnvmeEnv& env);
-   ~XnvmeChannel();
+   ~XnvmeChannel() ;
    // -------------------------------------------------------------------------------------
-   template <typename SubmissionFun>
+   template<typename SubmissionFun>
    void submission(SubmissionFun subFun, RaidRequest<XnvmeRequest>* req);
    // -------------------------------------------------------------------------------------
-   void _push(RaidRequest<XnvmeRequest>* req);
+   void _push(RaidRequest<XnvmeRequest>* req) ;
    void pushBlocking(IoRequestType type, char* data, s64 addr, u64 len, bool write_back) { throw std::logic_error("not implemented"); }
-   int _submit();
-   int _poll(int min = 0);
-   void _printSpecializedCounters(std::ostream& ss);
+   int _submit() ;
+   int _poll(int min = 0) ;
+   void _printSpecializedCounters(std::ostream& ss) ;
 };
 // -------------------------------------------------------------------------------------
-} // namespace mean
+}  // namespace mean
 // -------------------------------------------------------------------------------------
 #endif // LEANSTORE_INCLUDE_XNVME

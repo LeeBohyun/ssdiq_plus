@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <unordered_set>
 #include "Exceptions.hpp"
-#include "IoRequest.hpp"
+#include "leanstore/io/IoRequest.hpp"
 // -------------------------------------------------------------------------------------
 namespace mean
 {
