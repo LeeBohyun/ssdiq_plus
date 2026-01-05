@@ -60,16 +60,39 @@ Zones can be interleaved and allow overwrites after resets.
 PATTERN=zones
 ZONES="s0.9 f0.1 s0.1 f0.9"
 ```
-
 ---
 
-### NOWA (Non-Overwriting Write Access)
+### ZNS-like pattern (Non-Overwriting Write Access)
 
 Strictly ZNS-like workload:
 
 - Sequential writes per zone  
-- No overwrites without resets  
-- Models host-managed ZNS behavior  
+- Models host-managed ZNS behavior
+
+```sh
+PATTERN=zns
+```
+#### Optional Parameters
+
+| Variable | Description |
+|----------|-------------|
+| `ZNS_ACTIVE_ZONES` | Number of concurrently open zones |
+| `ZNS_ZONE_SIZE` | Size of each zone |
+
+Example:
+
+```sh
+PATTERN=zns ZNS_ACTIVE_ZONES=14 ZNS_ZONE_SIZE=1024M RATE=0
+```
+
+---
+
+### NOWA (No Write Amplification)
+
+Write pattern that guarantees SSD WAF ~= 1:
+
+- Sequential writes per zone  
+- Estimate multiplexing within concurrently open zones and issue compensation writes
 - Targets WAF ≈ 1  
 
 ```sh
@@ -82,7 +105,6 @@ PATTERN=nowa
 |----------|-------------|
 | `ZNS_ACTIVE_ZONES` | Number of concurrently open zones |
 | `ZNS_ZONE_SIZE` | Size of each zone |
-| `RATE` | Throttling rate (0 = unlimited) |
 
 Example:
 
@@ -114,11 +136,6 @@ make
 
 ### Simple NOWA Example
 
-```sh
-iob/iob --filename=/blk/w0 --pattern=nowa --rw=1
-```
-
-### Parameterized NOWA Example
 
 ```sh
 PATTERN=nowa ZNS_ACTIVE_ZONES=64 ZNS_ZONE_SIZE=128M RATE=0 \
